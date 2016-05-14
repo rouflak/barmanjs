@@ -1,7 +1,8 @@
 import Bottle from "bottlejs";
 
-export default class Barman
-{
+const MISSING_SERVICE_CONFIG = "Service %service% declared as parameter but could not be fined in configuration";
+
+export default class Barman {
     constructor(config = {}) {
         this.bottle = new Bottle();
         if (!config.services) {
@@ -12,27 +13,23 @@ export default class Barman
     }
 
     initialize() {
+        // Throws an error if a cyclic dependency is detected
+        // or if a service is missing in the container
+        this.checkConfigDependencies(this.config);
         if (this.config.services) {
             let services = this.config.services.slice();
-            while(services.length > 0) {
+            while (services.length > 0) {
                 for (let key in services) {
-                    let service = this.config.services[key];
                     try {
-                        this.checkDependencies(this.config, service);
-                        this.bottle.factory(service.name, function(container) {
-                            let instances = [];
-                            for (let i in service.parameters) {
-                                instances.push(container[service.parameters[i]]);
-                            }
-
-                            return new service.definition(...instances);
-                        });
-                        services = services.filter(function(serv) {
+                        let service = this.config.services[key];
+                        this.checkContainerDependencies(this.config, service);
+                        this.registerService(service);
+                        services = services.filter(function (serv) {
                             return serv.name !== service.name;
                         });
                     } catch(e) {
-                        if (!e.message.startsWith('Service dependency not found in container')) {
-                            throw e;
+                        if (!e.message.startsWith('Service dependency not found in container. Looked for ')) {
+                            throw e
                         }
                     }
                 }
@@ -40,18 +37,53 @@ export default class Barman
         }
     }
 
-    checkDependencies(serviceConfig, service) {
+    registerService(service) {
+        this.bottle.factory(service.name, function (container) {
+            let instances = [];
+            for (let i in service.parameters) {
+                instances.push(container[service.parameters[i]]);
+            }
+
+            return new service.definition(...instances);
+        });
+    }
+
+    checkConfigDependencies(config) {
+        if (config.services) {
+            for (let i in config.services) {
+                let service = config.services[i];
+                if (service.parameters) {
+                    if (!Array.isArray(service.parameters)) {
+                        throw new Error('Bad argument exception; Expect parameters to be array, ' + typeof(service.parameters) + ' given');
+                    }
+                    for (let i in service.parameters) {
+                        if (!this.configHasService(config, service.parameters[i])) {
+                            throw new Error(MISSING_SERVICE_CONFIG.replace('%service%', service.parameters[i]));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    findService(config, serviceName) {
+        return config.services.find((service) =>
+            service.name === serviceName
+        );
+    }
+
+    configHasService(config, serviceName) {
+        return undefined !== this.findService(config, serviceName);
+    }
+
+    checkContainerDependencies(config, service) {
         let dependencies = service.parameters;
 
         if (undefined !== dependencies) {
-            if (!Array.isArray(dependencies)) {
-                throw new Error('Bad argument exception; Expect parameters to be array, '+typeof(dependencies)+' given');
-            }
+            // Assumes this is as an array has it has already been checked
             for (let i in dependencies) {
                 let dependency = dependencies[i];
-                let serviceDependency = serviceConfig.services.find(function(serv) {
-                    return serv.name === dependency;
-                });
+                let serviceDependency = this.findService(config, dependency);
 
                 if (undefined !== serviceDependency
                     && undefined !== serviceDependency.parameters
@@ -60,9 +92,9 @@ export default class Barman
                 }
 
                 if (undefined === this.bottle.container[dependencies[i]]) {
-                    throw new Error('Service dependency not found in container while looking for '+dependencies[i]);
+                    throw new Error('Service dependency not found in container. Looked for ' + dependencies[i]);
                 }
             }
         }
     }
-}
+};

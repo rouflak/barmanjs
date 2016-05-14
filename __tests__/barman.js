@@ -17,6 +17,62 @@ describe('Barman', function() {
         constructor() {}
     }
 
+    it ("should check the configuration", () => {
+        let config = {
+            services: [
+                {
+                    name: 'serviceTest',
+                    definition: ServiceTest,
+                    parameters: ['subService', 'missingService']
+                },
+                {
+                    name: 'subService',
+                    definition: SubServiceTest
+                }
+            ]
+        };
+
+        let barman = new Barman();
+
+        expect(() => {barman.checkConfigDependencies(config)}).toThrow(new Error('Service missingService declared as parameter but could not be fined in configuration'));
+
+        config.services[1].parameters = "string";
+        config.services[0].parameters = ['subService'];
+        expect(() => {barman.checkConfigDependencies(config)}).toThrow(new Error('Bad argument exception; Expect parameters to be array, string given'))
+    });
+
+    it ("should find a service in the config", function() {
+        let config = {
+            services: [
+                {
+                    name: 'serviceTest',
+                    definition: ServiceTest
+                }
+            ]
+        };
+
+        let barman = new Barman();
+
+        expect(barman.findService(config, 'serviceTest')).toEqual(config.services[0]);
+        expect(barman.findService(config, 'inexistingService')).toBeUndefined();
+    });
+
+    it("should check whether a config has a service or not", function() {
+        let config = {
+            services: [
+                {
+                    name: 'serviceTest',
+                    definition: ServiceTest
+                }
+            ]
+        };
+
+        let barman = new Barman();
+
+        expect(barman.configHasService(config, 'serviceTest')).toBeTruthy();
+        expect(barman.configHasService(config, 'inexistingService')).toBeFalsy();
+    });
+
     it("should check depdencies for the object", function () {
         let barman = new Barman();
         let service = {
@@ -27,17 +83,19 @@ describe('Barman', function() {
         let config = {
             services: [service]
         };
-        expect(() => barman.checkDependencies(config, service)).toThrow(new Error('Service dependency not found in container while looking for subServiceTest'));
+        expect(() => barman.checkContainerDependencies(config, service)).toThrow(new Error('Service dependency not found in container. Looked for subServiceTest'));
 
         service = {
             name: 'serviceTest',
             definition: SubServiceTest
         };
+
         config = {
             services: [service]
         };
 
-        expect(barman.checkDependencies(config, service)).toBeUndefined();
+        expect(barman.checkContainerDependencies(config, service)).toBeUndefined();
+
     });
 
     it("should register a class in the barman's bottle container", function() {
@@ -86,7 +144,6 @@ describe('Barman', function() {
 
         let barman = new Barman();
 
-        expect(function() {barman.checkDependencies(configs, config)}).toThrow(new Error('Cyclic dependency detected'));
-
+        expect(function() {barman.checkContainerDependencies(configs, config)}).toThrow(new Error('Cyclic dependency detected'));
     });
 });
