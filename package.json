@@ -1,6 +1,6 @@
 {
   "name": "barman",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "description": "A dependency injection container",
   "main": "baramn.js",
   "scripts": {
