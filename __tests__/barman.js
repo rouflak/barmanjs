@@ -17,6 +17,25 @@ describe('Barman', function() {
         constructor() {}
     }
 
+
+    it("should return the container of the bottle", () => {
+        let barman = new Barman();
+        expect(barman.bottle.container).toEqual(barman.getContainer());
+    });
+
+    it ("should register a parameter from the config", () => {
+        let config = {
+            parameters: {
+                parameter1: "test",
+                parameter2: "test2"
+            }
+        };
+
+        let barman = new Barman(config);
+
+        expect(barman.getParameter('parameter1')).toEqual("test");
+    });
+
     it ("should check the configuration", () => {
         let config = {
             services: [
@@ -123,6 +142,30 @@ describe('Barman', function() {
         expect(serviceTest instanceof ServiceTest).toBeTruthy();
         expect(serviceTest.test instanceof SubServiceTest).toBeTruthy();
         expect(serviceTest.subTest2 instanceof SubServiceTest2).toBeTruthy();
+    });
+
+    it("should get the service in the container", function() {
+        let config = {
+            services: [
+                {
+                    name: 'serviceTest',
+                    definition: ServiceTest,
+                    parameters: ['subServiceTest', 'subServiceTest2']
+                },
+                {
+                    name: 'subServiceTest',
+                    definition: SubServiceTest
+                },
+                {
+                    name: 'subServiceTest2',
+                    definition: SubServiceTest2
+                }
+            ]
+        };
+
+        let barman = new Barman(config);
+
+        expect(barman.get("serviceTest") instanceof ServiceTest).toBeTruthy();
     });
 
     it("should throw an error if there is a cyclic dependency", function() {

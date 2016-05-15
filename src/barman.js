@@ -16,6 +16,33 @@ export default class Barman {
         // Throws an error if a cyclic dependency is detected
         // or if a service is missing in the container
         this.checkConfigDependencies(this.config);
+        this.registerParameters();
+        this.registerServices();
+
+    }
+
+    getContainer() {
+        return this.bottle.container;
+    }
+
+    get(serviceName) {
+        return this.getContainer()[serviceName];
+    }
+
+    getParameter(parameterName) {
+        return this.getContainer()[parameterName];
+    }
+
+    registerParameters() {
+        if (this.config.parameters) {
+            let parameters = this.config.parameters;
+            for (let i in parameters) {
+                this.bottle.value(i, parameters[i]);
+            }
+        }
+    }
+
+    registerServices() {
         if (this.config.services) {
             let services = this.config.services.slice();
             while (services.length > 0) {
