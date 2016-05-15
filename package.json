@@ -21,7 +21,7 @@
     ]
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "babel-jest": "^11.0.2",
     "bottlejs": "^1.2.3"
