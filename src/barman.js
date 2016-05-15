@@ -1,6 +1,6 @@
 import Bottle from "bottlejs";
 
-const MISSING_SERVICE_CONFIG = "Service %service% declared as parameter but could not be fined in configuration";
+const MISSING_SERVICE_CONFIG = "Service %service% is declared as parameter but could not be find in configuration";
 
 export default class Barman {
     constructor(config = {}) {
