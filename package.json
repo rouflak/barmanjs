@@ -1,5 +1,5 @@
 {
-  "name": "container",
+  "name": "barman",
   "version": "1.0.0",
   "description": "A dependency injection container",
   "main": "baramn.js",
