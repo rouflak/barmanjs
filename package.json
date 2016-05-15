@@ -5,7 +5,7 @@
   "main": "baramn.js",
   "scripts": {
     "test": "BABEL_STAGE_TEST=0 jest",
-    "preinstall": "webpack --config webpack.config.prod.js"
+    "postinstall": "webpack --config webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
