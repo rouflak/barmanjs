@@ -7,6 +7,10 @@
     "test": "BABEL_STAGE_TEST=0 jest",
     "preinstall": "webpack --config webpack.config.prod.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rouflak/barmanjs.git"
+  },
   "jest": {
     "collectCoverage": true,
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
