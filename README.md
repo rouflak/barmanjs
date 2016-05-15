@@ -19,7 +19,11 @@ services: [
     name: 'my.second-service',
     definition: MySecondService
   }
-]
+],
+
+parameters: {
+  api_endpoint: "https://my-apis.com/endpoint"
+}
 ```
 Services can be declared in a random order as the Barman will handle dependencies
 
