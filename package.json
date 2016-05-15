@@ -1,7 +1,7 @@
 {
-  "name": "barman",
+  "name": "barmanjs",
   "version": "0.1.2",
-  "description": "A dependency injection container",
+  "description": "A configuration handler for dependency injection",
   "main": "baramn.js",
   "scripts": {
     "test": "BABEL_STAGE_TEST=0 jest",
@@ -24,7 +24,7 @@
       "es6"
     ]
   },
-  "author": "",
+  "author": "rouflak <cyrille.gaucher@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "babel-jest": "^11.0.2",
