@@ -30,7 +30,7 @@
     "babel-jest": "^11.0.2",
     "bottlejs": "^1.2.3",
     "webpack": "^1.13.0",
-    "babel-loader": "^6.2.4",
+    "babel-loader": "^6.2.4"
   },
   "devDependencies": {
     "babel-core": "^6.7.7",
