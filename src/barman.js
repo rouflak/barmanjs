@@ -33,6 +33,49 @@ export default class Barman {
         return this.getContainer()[parameterName];
     }
 
+    static shake(config) {
+        let finalConfig = {};
+        if (config.resources) {
+            for (let i in config.resources) {
+                finalConfig = Barman.merge(config, config.resources[i]);
+            }
+        }
+
+        return finalConfig;
+    }
+
+    static merge(array1, array2) {
+        let finalArray = array1;
+        for (let i in array1) {
+            if (array2[i]) {
+                // Check types
+                if (typeof(array1[i]) !== typeof(array2[i])) {
+                    throw new Error("Could not merge type "+typeof array1[i]+" with type "+typeof array2[i]+" on key "+i);
+                }
+
+                if (Array.isArray(array1[i])
+                    && !Array.isArray(array2[i])
+                    || !Array.isArray(array1[i])
+                    && Array.isArray(array2[i])) {
+                    let typeArray1 = Array.isArray(array1[i]) ? "array" : typeof array1[i];
+                    let typeArray2 = Array.isArray(array2[i]) ? "array" : typeof array2[i];
+                    throw new Error("Could not merge type "+typeArray1+" with type "+typeArray2+" on key "+i);
+                }
+
+                if (Array.isArray(array1[i])
+                    && Array.isArray(array2[i])) {
+                    finalArray[i] = array1[i].concat(array2[i]);
+                } else if ("string" === typeof array1[i]) {
+                    finalArray[i] = array2[i];
+                } else {
+                    finalArray[i] = Object.assign({}, array1[i], array2[i]);
+                }
+            }
+        }
+
+        return finalArray;
+    }
+
     registerParameters() {
         if (this.config.parameters) {
             let parameters = this.config.parameters;

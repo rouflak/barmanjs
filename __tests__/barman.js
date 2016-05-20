@@ -189,4 +189,76 @@ describe('Barman', function() {
 
         expect(function() {barman.checkContainerDependencies(configs, config)}).toThrow(new Error('Cyclic dependency detected'));
     });
+
+
+    it("should shake the configurations", () => {
+        let config1 = {
+            services: [
+                {
+                    name: "service1Config1",
+                    definition: ServiceTest
+                },
+                {
+                    name: "service2Config1",
+                    definition: ServiceTest
+                },
+                {
+                    name: "service3Config1",
+                    definition: ServiceTest
+                }
+            ],
+            parameters: {
+                "param1Config1": "param1Config1",
+                "param2Config1": "param2Config1",
+                "paramConfig": "param3Config1"
+            },
+            extra: "test"
+        };
+        let config2 = {
+            services: [
+                {
+                    name: "service1Config2",
+                    definition: ServiceTest
+                },
+                {
+                    name: "service2Config2",
+                    definition: ServiceTest
+                }
+            ],
+            parameters: {
+                "param1Config2": "param1Config2",
+                "param2Config2": "param2Config2"
+            }
+        };
+        let config = {
+            resources: [config1, config2],
+            services: [
+                {
+                    name: "service1Config",
+                    definition: ServiceTest
+                },
+                {
+                    name: "service2Config",
+                    definition: ServiceTest
+                }
+            ],
+            parameters: {
+                "paramConfig": "paramConfig"
+            }
+        }
+
+        let expected = {
+            resources: [config1, config2],
+            services: config.services.concat(config1.services, config2.services),
+            parameters: {
+                "param1Config1": "param1Config1",
+                "param2Config1": "param2Config1",
+                "paramConfig": "param3Config1",
+                "param1Config2": "param1Config2",
+                "param2Config2": "param2Config2"
+            }
+        };
+
+        expect(Barman.shake(config)).toEqual(expected);
+    });
 });
