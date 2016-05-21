@@ -1,11 +1,11 @@
 {
   "name": "barmanjs",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "description": "A configuration handler for dependency injection",
   "main": "dist/barman.js",
   "scripts": {
     "test": "BABEL_STAGE_TEST=0 jest",
-    "postinstall": "webpack --config webpack.config.prod.js"
+    "prepublish": "webpack --config webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
