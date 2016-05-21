@@ -5,7 +5,7 @@
   "main": "dist/barman.js",
   "scripts": {
     "test": "BABEL_STAGE_TEST=0 jest",
-    "prepublish": "webpack --config webpack.config.prod.js"
+    "prepublish": "webpack --config webpack.config.js && webpack --config webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
